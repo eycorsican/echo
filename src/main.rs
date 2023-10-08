@@ -19,6 +19,7 @@ async fn echo_tcp(port: u16) {
             break;
         };
         tokio::spawn(async move {
+            println!("Accepted TCP stream from {}", stream.peer_addr().unwrap());
             let (mut r, mut w) = stream.split();
             tokio::io::copy(&mut r, &mut w).await;
         });
@@ -32,6 +33,7 @@ async fn echo_udp(port: u16) {
         let Ok((n, addr)) = socket.recv_from(&mut buf).await else {
             break;
         };
+        println!("Received {} bytes from {}", n, &addr);
         if socket.send_to(&buf[..n], addr).await.is_err() {
             break;
         }
