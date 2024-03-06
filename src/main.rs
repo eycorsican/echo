@@ -11,9 +11,7 @@ struct Echo {
 }
 
 async fn echo_tcp(port: u16) {
-    let listener = TcpListener::bind(format!("0.0.0.0:{}", port))
-        .await
-        .unwrap();
+    let listener = TcpListener::bind(format!("[::]:{}", port)).await.unwrap();
     loop {
         let Ok((mut stream, _)) = listener.accept().await else {
             break;
@@ -27,7 +25,7 @@ async fn echo_tcp(port: u16) {
 }
 
 async fn echo_udp(port: u16) {
-    let socket = UdpSocket::bind(format!("0.0.0.0:{}", port)).await.unwrap();
+    let socket = UdpSocket::bind(format!("[::]:{}", port)).await.unwrap();
     let mut buf = vec![0u8; 2 * 1024];
     loop {
         let Ok((n, addr)) = socket.recv_from(&mut buf).await else {
@@ -43,6 +41,6 @@ async fn echo_udp(port: u16) {
 #[tokio::main]
 async fn main() {
     let args: Echo = argh::from_env();
-    println!("Listening :{}", args.port);
+    println!("Listening [::]:{}", args.port);
     tokio::join!(echo_tcp(args.port), echo_udp(args.port));
 }
